@@ -1,4 +1,7 @@
 fastapi==0.111.0
+# pydantic and pydantic-core must be a matching pair (mixed conda/pip often breaks this).
+pydantic==2.13.3
+pydantic-core==2.46.3
 uvicorn[standard]==0.29.0
 ultralytics==8.2.0
 python-multipart==0.0.9
