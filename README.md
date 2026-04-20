@@ -4,6 +4,8 @@ A small end-to-end showcase for **object detection** in a driving context: uploa
 
 This repo is meant for **cloning, running locally, and portfolio / demo use** — it pairs a trained detector with a simple API and frontend so others can try it without digging through notebooks first.
 
+The project ships with a **Dockerfile** for reproducible container runs, is **deployed on [Render](https://render.com/)**, and **model training is ongoing** to keep improving detection accuracy.
+
 ---
 
 ## Features
@@ -11,6 +13,7 @@ This repo is meant for **cloning, running locally, and portfolio / demo use** �
 - **Web app** — Drag-and-drop or click to upload images; adjustable **confidence** and **IoU** thresholds; results show an annotated image plus a per-detection table (class, score, bbox).
 - **REST API** — `POST /detect` accepts image uploads and returns JSON (base64 annotated image, detections, summary stats).
 - **Notebook** — `notebooks/Autonomous_Driving_Part1.ipynb` documents the data-prep and training workflow (e.g. Colab-oriented paths); use it as a reference if you want to retrain or adapt the pipeline.
+- **Active training** — The model is still being trained and tuned to improve accuracy; newer `best.pt` checkpoints can be swapped in as they become available.
 
 ---
 
@@ -22,6 +25,7 @@ This repo is meant for **cloning, running locally, and portfolio / demo use** �
 | **ML** | [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics), [OpenCV](https://opencv.org/) (headless), [NumPy](https://numpy.org/), [Pillow](https://python-pillow.org/) |
 | **Frontend** | Static HTML, CSS, vanilla JavaScript (no build step) |
 | **API** | OpenAPI / automatic docs at `/docs` when the server is running |
+| **Deployment** | [Docker](https://www.docker.com/) (see [`Dockerfile`](Dockerfile)), [Render](https://render.com/) (see [`render.yaml`](render.yaml)) |
 
 Python dependencies are pinned in [`requirements.txt`](requirements.txt).
 
@@ -30,10 +34,12 @@ Python dependencies are pinned in [`requirements.txt`](requirements.txt).
 ## Repository layout
 
 ```
-autonomous_driving_demo/
+.
 ├── main.py              # FastAPI app: /detect + static frontend
 ├── best.pt              # YOLO weights (required at runtime — see below)
 ├── requirements.txt
+├── Dockerfile           # Container image for local or cloud runs
+├── render.yaml          # Render web service config
 ├── frontend/
 │   └── index.html       # UI served at /
 └── notebooks/
@@ -55,7 +61,7 @@ autonomous_driving_demo/
 
    ```bash
    git clone <your-repo-url>
-   cd autonomous_driving_demo
+   cd vehicles_detection_with_YOLOv8   # or your clone directory name
    ```
 
 2. **Create a virtual environment and install dependencies**
@@ -76,6 +82,25 @@ autonomous_driving_demo/
 
 5. **Open the app** — In a browser, go to [http://127.0.0.1:8000](http://127.0.0.1:8000).  
    Interactive API docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+
+---
+
+## Docker
+
+Build and run with Docker from the project root (ensure `best.pt` is present — the image copies it at build time):
+
+```bash
+docker build -t vehicle-detection-yolov8 .
+docker run --rm -p 8000:8000 vehicle-detection-yolov8
+```
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+---
+
+## Deploying on Render
+
+[`render.yaml`](render.yaml) defines a Render **web service** (Python build, Uvicorn start command). Connect this repository in the Render dashboard and use that blueprint, or create a web service manually with the same install and start commands. Ensure `best.pt` is available in the deployment environment (e.g. committed if your workflow allows, uploaded as a build artifact, or fetched from storage).
 
 ---
 
