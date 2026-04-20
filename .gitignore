@@ -9,3 +9,11 @@ __pycache__/
 
 # Ignore environment variables (sensitive data)
 .env
+
+# YOLOv8 training artifacts
+runs/
+*.cache
+
+# OS
+.DS_Store
+Thumbs.db
